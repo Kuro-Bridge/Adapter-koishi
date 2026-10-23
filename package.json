@@ -27,10 +27,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "https://github.com/Kuro-Bridge/koishi-plugin-kurobridge#readme",
+  "homepage": "https://github.com/Kuro-Bridge/Adapter-koishi#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Kuro-Bridge/koishi-plugin-kurobridge.git"
+    "url": "git+https://github.com/Kuro-Bridge/Adapter-koishi.git"
   },
   "keywords": [
     "chatbot",
