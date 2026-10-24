@@ -1,79 +1,149 @@
-# koishi-plugin-kurobridge
+<div align="center">
 
-[![npm](https://img.shields.io/npm/v/koishi-plugin-kurobridge?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-kurobridge)
+<h1 id="kurobridge-adapter-koishi">
+  <img src=".github/assets/wordmark.svg" alt="KuroBridge Adapter-Koishi" width="560">
+</h1>
 
-[kurobridge-ws](https://github.com/Kuro-Bridge/KuroAdapter) 协议的 **Koishi v4 官方参考对端**：
-把 Koishi 接入的聊天平台（QQ 等）与 Minecraft 服务器双向互通——群聊 ↔ 游戏内聊天、
-群指令 → 服务器命令、进服/退服/死亡/状态事件广播回群。
+**`kurobridge-ws` 的 Koishi v4 官方参考对端 —— 把 Koishi 接入的聊天平台与 Minecraft 服务器双向互通**
 
-- **角色**：本插件是 WS **客户端**，主动连入 MC 侧 KuroBridge 服务端（`kurobridge-ws.v1`），
-  不监听任何端口；绑定哪些频道（群）由 MC 服主配置决定（SSOT 在服务端）。
-- **协议**：帧定义以 [@kuro-bridge/protocol](https://www.npmjs.com/package/@kuro-bridge/protocol)
-  （0.4.0）为唯一来源；连接语义（握手/心跳/关闭策略）对表
-  [peer-guide](https://github.com/Kuro-Bridge/KuroAdapter/blob/master/docs/protocol/peer-guide.md)。
+<p>
+  <sub>npm</sub> <code>koishi-plugin-kurobridge</code>
+  &emsp;<sub>版本</sub> <code>0.2.0</code>
+  &emsp;<sub>宿主</sub> <code>Koishi ^4.18</code>
+  &emsp;<sub>角色</sub> <code>WS 客户端 · 不监听端口</code>
+  &emsp;<sub>许可</sub> <code>MIT</code>
+</p>
+
+<p>
+  <a href="#安装与部署">安装与部署</a> •
+  <a href="#配置">配置</a> •
+  <a href="#注意事项">注意事项</a> •
+  <a href="#开发与发版">开发与发版</a> •
+  <a href="#english">English</a>
+</p>
+
+</div>
+
+> [!NOTE]
+> GitHub 仓名为 **Adapter-koishi**（2026-10-23 由 `koishi-plugin-kurobridge` 更名），npm 包名不变；\
+> 「KuroBridge」为产品与生态统称，本插件是其 Koishi 对端实现。
+
+---
+
+## 生态定位
+
+```text
+KuroBridge 生态（协议视角）
+│
+├─ 协议契约 SSOT · KuroProtocol（独立仓）
+│    kurobridge-ws v0.4.0：zod schema + 对端规格书 + 16 份金样本
+│    本插件经 npm 依赖 @kuro-bridge/protocol ^0.4.0 消费
+│
+├─ MC 侧 · WS 服务端（对端主动连入，服务端不回连）
+│    ├─ KuroAdapter · 全量线：Paper JAR + 内嵌 Node 业务核心
+│    └─ KuroAdapter-Pure · 纯净线：纯 Java Paper 插件
+│
+└─ 聊天侧 · WS 客户端（连入上述服务端）
+     ├─ Adapter-koishi（← 本仓）· 官方对端：koishi-plugin-kurobridge（Koishi v4 插件）
+     └─ napukettoqq 等第三方对端
+```
+
+- **本插件是 WS 客户端**：主动连入 MC 侧 KuroBridge 服务端（子协议 `kurobridge-ws.v1`），不监听任何端口；断线重连由本插件的状态机自担。
+- **绑定关系由服务端决定**：哪些群与服务器互通（`channels` 绑定表）的 SSOT 在 MC 侧配置。
+- **平台渲染只在本仓**：Koishi 元素 → 游戏文本的降级、`§` 色码剥离与长度收敛由本插件承担。
+
+群聊 ↔ 游戏内聊天、群指令 → 服务器命令、进服 / 退服 / 死亡 / 状态事件广播回群。
+
+## 工作原理
+
+五层单向依赖（装配 → 核心 → 翻译 → 连接 → 协议），平台无关部分与 Koishi 装配分离：
+
+| 层 | 文件 | 职责 |
+| :--- | :--- | :--- |
+| 装配 | `src/index.ts` | Koishi 插件装配：`Schema` 配置面板、hello 身份上报、`ctx.on("message")` 入站与自过滤、单频道 `ctx.broadcast`、`dispose` 清理 |
+| 核心 | `src/adapter.ts` | 平台无关核心：绑定集镜像（快照 + `bindings_updated` 热更）、入站过滤链、command / query 的 UUID pending、四事件分发 |
+| 翻译 | `src/translate.ts` | 纯函数翻译：Koishi 元素树降级（text / at / img / face / quote / br / p）、四模板渲染、`§` 色码剥离、UTF-16 截断、`command_result` 三态 |
+| 连接 | `src/connection.ts` | WS 客户端状态机：子协议握手、hello / hello_ack 关联、应用层心跳、close code 感知的指数退避重连（±20% 抖动）、未知帧容忍、三类永久停 |
+| 协议 | `src/protocol/` | `@kuro-bridge/protocol` 依赖单一出口；golden 对表测试锁定发布件线格式，上游漂移立即红 |
+
+连接语义（握手 / 心跳 / 关闭策略）对表 [peer-guide](https://github.com/Kuro-Bridge/KuroProtocol/blob/main/docs/peer-guide.md)。
+
+## 安装与部署
+
+安装二选一：Koishi 市场搜索 `kurobridge` 一键安装；或手动 `npm i koishi-plugin-kurobridge`。协议包 `@kuro-bridge/protocol` 作为运行时依赖自动安装，无需手动处理。
+
+部署三步：
+
+| 步骤 | 侧 | 操作 |
+| :--- | :--- | :--- |
+| 1 | MC 侧 | 安装 KuroBridge 插件（[KuroAdapter](https://github.com/Kuro-Bridge/KuroAdapter) 或 [KuroAdapter-Pure](https://github.com/Kuro-Bridge/KuroAdapter-Pure) 的 Paper JAR），在 config 的 `ws` 段固定端口、设置 `token`，并把目标群加入 `channels` 绑定表 |
+| 2 | Koishi 侧 | 启用本插件，`url` 填 `ws://<服务器地址>:<端口>`，`token` 与 MC 侧一致 |
+| 3 | 验证 | Koishi 日志出现 `kurobridge: 握手成功` 与绑定快照；群内发消息进游戏、游戏内发言回群 |
+
+> [!WARNING]
+> 协议为明文 WS（无 TLS）：跨公网部署必须走隧道——推荐反代 TLS 终结（`wss://`）或 wireguard。
 
 ## 配置
 
 | 配置项 | 类型 | 缺省 | 说明 |
-| --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- |
 | `url` | string | **必填** | KuroBridge 服务端地址（`ws://` / `wss://`） |
-| `token` | string | `""` | 鉴权 token；MC 侧配置了非空 token 时必须一致，否则连接被拒（close 1008，不重连） |
+| `token` | string | `""` | 鉴权 token；MC 侧配置了非空 token 时必须一致，否则 close 1008 且不重连 |
 | `name` | string | `"koishi"` | 对端实例标识（hello.peerId，服务端日志辨识用） |
 | `client` | string | 运行时算 | 自报身份串，缺省 `koishi-plugin-kurobridge/<版本>` |
 | `commandPrefix` | string | `"/"` | 消息以该前缀开头 → 作为服务器命令发送（如 `/whitelist list`），否则进游戏聊天 |
 | `pingIntervalMs` | number | `15000` | 应用层心跳间隔（服务端空闲阈值 30s，须显著小于） |
-| `chatTemplate` | string | `"[{player}] {content}"` | 游戏聊天渲染模板 |
-| `joinTemplate` | string | `"{player} 加入了服务器"` | 进服模板 |
-| `leaveTemplate` | string | `"{player} 离开了服务器"` | 退服模板 |
-| `deathTemplate` | string | `"{player} {message}"` | 死亡模板（死亡消息为空时以「死亡了」代入） |
 | `stripColorCodes` | boolean | `true` | 剥离 `§` 颜色代码（多数聊天端显示为乱码） |
-| `maxMessageLength` | number | `1500` | 出站文本长度上限（UTF-16 码元，超长截断加「…(截断)」） |
+| `maxMessageLength` | number | `1500` | 出站文本上限（UTF-16 码元，超长截断加「…(截断)」） |
 
-模板占位符：`{player}` / `{content}` / `{message}`；缺省变量代空串，未知占位符原样保留。
+<details>
+<summary><b>消息模板</b>（chat / join / leave / death 四项）</summary>
 
-## 安装
+| 配置项 | 缺省 | 说明 |
+| :--- | :--- | :--- |
+| `chatTemplate` | `"[{player}] {content}"` | 游戏聊天渲染模板 |
+| `joinTemplate` | `"{player} 加入了服务器"` | 进服模板 |
+| `leaveTemplate` | `"{player} 离开了服务器"` | 退服模板 |
+| `deathTemplate` | `"{player} {message}"` | 死亡模板（死亡消息为空时以「死亡了」代入） |
 
-- Koishi 市场搜索 `kurobridge` 一键安装；
-- 或手动安装：`npm i koishi-plugin-kurobridge`。
+占位符：`{player}` / `{content}` / `{message}`；缺省变量代空串，未知占位符原样保留。
 
-协议包 `@kuro-bridge/protocol` 会作为本插件的运行时依赖自动安装，无需手动处理。
+</details>
 
-## 部署
+## 注意事项
 
-1. **MC 侧**：安装 KuroBridge 插件（Paper JAR），在 `plugins/kurobridge/config.json` 的
-   `ws` 段配置**固定端口**（external 部署必须，如 25580）与 `token`（强烈建议非空），
-   并把目标群号加入 `channels` 绑定表；详细步骤见
-   [peer-guide](https://github.com/Kuro-Bridge/KuroAdapter/blob/master/docs/protocol/peer-guide.md)。
-2. **Koishi 侧**：安装本插件，`url` 填 `ws://<服务器地址>:<端口>`，`token` 与 MC 侧一致。
-   跨公网必须走隧道（协议为明文 WS，无 TLS；推荐反代 TLS 终结或 wireguard）。
-3. 验证：Koishi 日志出现 `kurobridge: 握手成功` 与绑定快照即通；群内发消息进游戏、
-   游戏内发言回群。
+> [!CAUTION]
+> **一条连接原则**：一个逻辑协议端只保持一条连接。同一 Koishi 实例不要配置多个 kurobridge 条目指向同一服务器，否则游戏内消息重复。
 
-**注意**：
+> [!NOTE]
+> **多对端并存语义**：每个已握手对端都会收到全部游戏事件——两端绑定同一频道会重复广播，属设计语义；需要隔离就让两端绑定不同频道。
 
-- **一个逻辑协议端只保持一条连接**；同一 Koishi 实例不要配置多个 kurobridge 条目指向
-  同一服务器（会导致游戏内消息重复）。
-- **多对端并存**（如同时挂 napukettoqq 与本插件）：每个已握手对端都会收到全部游戏事件
-  ——同频道会重复广播，属设计语义；如需避免，请让两端绑定不同频道。
-- 命令的管理员判定在 MC 侧（`config.json` 的 `admins` 按 `channel + userId` 匹配），
-  非管理员会收到 `命令失败：forbidden`。
+> [!NOTE]
+> **管理员判定在 MC 侧**：command 帧由服务端 `admins`（`channel + userId`）匹配放行；非管理员收到 `命令失败：forbidden`。
 
-## 开发
+## 开发与发版
 
 ```bash
-bun install            # 在宿主工作区根目录执行一次（workspace 成员依赖提升）
-bun run check          # 门禁：biome + 类型检查
-bun run test           # vitest（协议 golden 对表 + 连接/翻译/适配/装配四层）
-bun run build          # 构建（产物 lib/index.cjs，CJS）
+bun install         # 先在宿主工作区根目录执行一次（workspace 成员依赖提升）
+bun run check       # 门禁：biome check + tsc --noEmit
+bun run test        # vitest：协议 golden + 连接 / 翻译 / 适配 / 装配（90 用例）
+bun run build       # tsdown → lib/index.cjs（CJS，Koishi loader 用 require 加载）
+bun run release     # changeset version → tsdown → npm publish
 ```
 
-- 分层：`src/protocol/`（协议依赖统一出口）→ `src/connection.ts`（WS 客户端状态机）→
-  `src/translate.ts`（纯函数翻译）→ `src/adapter.ts`（平台无关核心）→ `src/index.ts`
-  （Koishi 装配）。平台渲染（富文本降级/色码剥离/长度收敛）只在本仓。
-- **协议依赖**：插件以 `@kuro-bridge/protocol@^0.4.0` 为真实运行时依赖——0.4.0 起
-  `exports` 为双格式（含 `require`），CJS 产物可直接 require 解析（ADR-001 阶段 2 落地，
-  KD-10 结案）；tsdown 不再将协议包内联进产物，原 `alwaysBundle` 绕行例外已移除。
-- KuroAdapter 侧协议改动须保持与已发布 `@kuro-bridge/protocol` 一致；本仓 golden 对表
-  测试（`src/protocol/golden.test.ts`）锁定发布件线格式，上游漂移会在此立即红。
+- **Changesets**：每次用户可见改动随提交写 `.changeset/` 条目（0.x：破坏 → minor，修复 → patch）。
+- **exports 三态**：`types` → `lib/index.d.ts`；`development` → `src/index.ts`；`default` → `lib/index.cjs`。开发态直读 TS，发布件走 CJS。
+- **协议依赖**：`@kuro-bridge/protocol ^0.4.0` 是真实运行时依赖（0.4.0 起 exports 含 `require`，CJS 产物可直接解析，KD-10 结案）；本仓 golden 测试锁定发布件线格式，上游协议漂移立即红。
+- 约定详见 [AGENTS.md](AGENTS.md)；决策史（KD-01~13）见 [docs/KUROBRIDGE-NOTES.md](docs/KUROBRIDGE-NOTES.md)，变更明细见 [CHANGELOG.md](CHANGELOG.md)。
 
-约定详见 `AGENTS.md`；执行实录与决策记录见 `docs/KUROBRIDGE-NOTES.md`。
+---
+
+## English
+
+`koishi-plugin-kurobridge` is the official Koishi v4 peer of the KuroBridge ecosystem: a WebSocket **client** that connects into a Minecraft-side KuroBridge server (`kurobridge-ws.v1`) and bridges chat platforms attached to Koishi with the game — group chat ↔ in-game chat, group commands → server commands, and join / leave / death / status broadcasts back to groups. Protocol frames come from `@kuro-bridge/protocol` (v0.4.0); connection semantics follow the [peer guide](https://github.com/Kuro-Bridge/KuroProtocol/blob/main/docs/peer-guide.md).
+
+```bash
+npm i koishi-plugin-kurobridge
+```
+
+*Repo renamed to `Adapter-koishi` (npm package name unchanged). Entirely original implementation, released under the [MIT License](./LICENSE).*
