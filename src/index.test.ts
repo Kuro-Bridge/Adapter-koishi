@@ -1,5 +1,5 @@
 /**
- * index.test.ts：Koishi 装配层集成测试（任务书 M5）。
+ * index.test.ts：Koishi 装配层集成测试。
  *
  * 轻量 ctx 桩（收集 broadcast / logger 调用，转发 on 注册的事件）+ 假服务端全链路：
  * apply → hello 身份 → 入站消息过滤（绑定/自过滤/命令分流）→ 游戏事件广播 → dispose。
@@ -201,7 +201,7 @@ describe("Koishi 装配", () => {
         emit("dispose", undefined);
     });
 
-    it("自过滤：bot 自身消息不转发（KD-05 防环）", async () => {
+    it("自过滤：bot 自身消息不转发（防环）", async () => {
         const s = await server();
         const { emit } = await setupPlugin(["967493177"]);
         emit(

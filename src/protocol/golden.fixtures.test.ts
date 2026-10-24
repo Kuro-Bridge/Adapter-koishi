@@ -3,7 +3,7 @@
  *
  * 0.4.0 起发布件自带金样本夹具（fixtures 不经 exports 暴露，消费方式=文件读取）：
  * 版本目录轴与 PROTOCOL_VERSION 对齐、全量夹具逐个通过包导出的 validateFixture
- * 契约校验（ADR-002 选 C）、SHA256SUMS 清单双向完整性。上游金样本漂移此处立即红。
+ * 契约校验、SHA256SUMS 清单双向完整性。上游金样本漂移此处立即红。
  */
 import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -37,7 +37,7 @@ function listFilesRel(dir: string, rel = ""): string[] {
     return files;
 }
 
-describe("包内金样本 fixtures/v0.4 契约（KD-10 结案后随包消费）", () => {
+describe("包内金样本 fixtures/v0.4 契约（随发布件消费）", () => {
     it("版本目录对齐：fixtures 版本轴 ≡ PROTOCOL_VERSION 的 major.minor", () => {
         expect(basename(fixturesDir)).toBe(versionDir);
         const dirs = readdirSync(fixturesRoot, { withFileTypes: true })

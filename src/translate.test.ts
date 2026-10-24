@@ -1,5 +1,5 @@
 /**
- * translate.test.ts：翻译层纯函数表驱动用例（任务书 M3）。
+ * translate.test.ts：翻译层纯函数表驱动用例。
  *
  * 入站降级（元素树→文本）、出站渲染（四模板/色码剥离/截断）、command_result 三态。
  */

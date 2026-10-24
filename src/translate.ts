@@ -1,18 +1,18 @@
 /**
- * 翻译层纯函数（任务书 M3）——平台渲染唯一归属（ADR-018）。
+ * 翻译层纯函数——平台渲染唯一归属。
  *
  * 入站（平台→MC）：Koishi 元素树降级为单行文本（无法表达的类型静默跳过，
  * 空白返回 null = 不发——协议要求 content 非空）。
  * 出站（MC→平台）：四模板占位符渲染（{player}/{content}/{message}，缺省变量代空串、
  * 未知占位符原样保留）+ § 色码剥离（配置开关）+ 长度截断（UTF-16 码元）。
  *
- * 不 import koishi（KD-08）：TreeElement 是 Koishi `h` 元素的最小结构面
+ * 不 import koishi：TreeElement 是 Koishi `h` 元素的最小结构面
  * （type/attrs/children，text 内容承载在 attrs.content），装配层直接传
  * session.elements 即结构匹配。
  */
 import type { CommandResultBody } from "./protocol/index.js";
 
-/** Koishi 元素树最小结构面（h 元素的结构子集；M5 装配传 session.elements）。 */
+/** Koishi 元素树最小结构面（h 元素的结构子集；装配传 session.elements）。 */
 export interface TreeElement {
     type: string;
     attrs: Record<string, unknown>;
@@ -22,7 +22,7 @@ export interface TreeElement {
 /** 模板占位符全集（chat 用 content、death 用 message；player 四类通用）。 */
 export const TEMPLATE_PLACEHOLDERS = ["player", "content", "message"] as const;
 
-/** 出站渲染缺省（对齐 napuketto，KD-07）。 */
+/** 出站渲染缺省。 */
 export const DEFAULT_TEMPLATES = {
     chat: "[{player}] {content}",
     join: "{player} 加入了服务器",
@@ -30,7 +30,7 @@ export const DEFAULT_TEMPLATES = {
     death: "{player} {message}",
 } as const;
 
-/** 出站文本长度上限缺省（napuketto 同值）。 */
+/** 出站文本长度上限缺省。 */
 export const DEFAULT_MAX_MESSAGE_LENGTH = 1500;
 
 /** 截断追加的省略标记。 */
@@ -39,7 +39,7 @@ const TRUNCATE_SUFFIX = "…(截断)";
 /** § 色码（§+0-9/a-f/k-o/r，MC legacy 格式化码）。 */
 const COLOR_CODE_PATTERN = /§[0-9a-fk-or]/g;
 
-/** 出站渲染选项（M5 由插件配置注入；M4 适配层透传）。 */
+/** 出站渲染选项（装配层由插件配置注入；适配层透传）。 */
 export interface RenderOptions {
     chatTemplate: string;
     joinTemplate: string;
@@ -134,7 +134,7 @@ export function degradeElements(elements: readonly TreeElement[]): string | null
 
 // ---- 出站：MC → 平台（模板渲染 + 色码剥离 + 截断） ----
 
-/** § 色码剥离（`§[0-9a-fk-or]`；色码在多数聊天端显示为乱码，KD-07 缺省开）。 */
+/** § 色码剥离（`§[0-9a-fk-or]`；色码在多数聊天端显示为乱码，缺省开）。 */
 export function stripColorCodes(text: string): string {
     return text.replaceAll(COLOR_CODE_PATTERN, "");
 }

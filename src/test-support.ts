@@ -1,10 +1,10 @@
 /**
- * 测试支撑：假 kurobridge-ws 服务端（ws 库起真端口，任务书 M2）。
+ * 测试支撑：假 kurobridge-ws 服务端（ws 库起真端口）。
  *
  * 仅供相邻 *.test.ts 使用（vitest 按文件名拾取 *.test.ts；本文件不进 tsdown 构建产物
  * ——入口只有 src/index.ts）。握手子协议校验复刻 KuroAdapter NodeWsServer
  * （handleProtocols 不带 `kurobridge-ws.v1` 返回 false = 拒连）；hello 的应答行为由
- * 用例注入。M4 适配层测试复用本支撑。
+ * 用例注入。适配层测试复用本支撑。
  */
 import { type WebSocket, WebSocketServer } from "ws";
 import { encodeFrame, WS_SUBPROTOCOL } from "./protocol/index.js";

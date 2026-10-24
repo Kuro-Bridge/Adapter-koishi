@@ -1,5 +1,5 @@
 /**
- * adapter.test.ts：KurobridgeAdapter 假服务端全链路单测（任务书 M4）。
+ * adapter.test.ts：KurobridgeAdapter 假服务端全链路单测。
  *
  * 覆盖：入站过滤链（绑定/空文本/命令分流/空命令忽略）、command_result 三态渲染、
  * 服务端四事件模板渲染 + § 剥离 + 截断、bindings 热更、query 往返、status 透传、

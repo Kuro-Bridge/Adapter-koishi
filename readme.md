@@ -1,32 +1,32 @@
 <div align="center">
 
-<h1 id="kurobridge-adapter-koishi">
-  <img src=".github/assets/wordmark.svg" alt="KuroBridge Adapter-Koishi" width="560">
-</h1>
+<img src=".github/assets/wordmark.svg" alt="KuroBridge Adapter-Koishi" width="560">
 
-**`kurobridge-ws` 的 Koishi v4 官方参考对端 —— 把 Koishi 接入的聊天平台与 Minecraft 服务器双向互通**
+**kurobridge-ws 的 Koishi v4 官方参考对端**
+
+<small>群聊 ↔ 游戏聊天 · 群指令 → 服务器命令 · 进服 / 退服 / 死亡 / 状态广播回群</small>
 
 <p>
-  <sub>npm</sub> <code>koishi-plugin-kurobridge</code>
-  &emsp;<sub>版本</sub> <code>0.2.0</code>
-  &emsp;<sub>宿主</sub> <code>Koishi ^4.18</code>
-  &emsp;<sub>角色</sub> <code>WS 客户端 · 不监听端口</code>
-  &emsp;<sub>许可</sub> <code>MIT</code>
+  <img src="https://img.shields.io/npm/v/koishi-plugin-kurobridge?style=flat" alt="npm：koishi-plugin-kurobridge">
+  &emsp;
+  <img src="https://img.shields.io/badge/宿主-Koishi%20%5E4.18-57606A?style=flat" alt="宿主：Koishi ^4.18">
+  &emsp;
+  <img src="https://img.shields.io/badge/角色-WS%20客户端-3E7C7C?style=flat" alt="角色：WS 客户端">
+  &emsp;
+  <img src="https://img.shields.io/badge/协议-kurobridge--ws%200.4.0-4C71A3?style=flat" alt="协议：kurobridge-ws 0.4.0">
+  &emsp;
+  <img src="https://img.shields.io/badge/许可-MIT-6E7781?style=flat" alt="许可：MIT">
 </p>
 
 <p>
-  <a href="#安装与部署">安装与部署</a> •
-  <a href="#配置">配置</a> •
-  <a href="#注意事项">注意事项</a> •
-  <a href="#开发与发版">开发与发版</a> •
+  <a href="#安装与部署">安装与部署</a> ·
+  <a href="#配置">配置</a> ·
+  <a href="#注意事项">注意事项</a> ·
+  <a href="#开发与发版">开发与发版</a> ·
   <a href="#english">English</a>
 </p>
 
 </div>
-
-> [!NOTE]
-> GitHub 仓名为 **Adapter-koishi**（2026-10-23 由 `koishi-plugin-kurobridge` 更名），npm 包名不变；\
-> 「KuroBridge」为产品与生态统称，本插件是其 Koishi 对端实现。
 
 ---
 
@@ -51,8 +51,6 @@ KuroBridge 生态（协议视角）
 - **本插件是 WS 客户端**：主动连入 MC 侧 KuroBridge 服务端（子协议 `kurobridge-ws.v1`），不监听任何端口；断线重连由本插件的状态机自担。
 - **绑定关系由服务端决定**：哪些群与服务器互通（`channels` 绑定表）的 SSOT 在 MC 侧配置。
 - **平台渲染只在本仓**：Koishi 元素 → 游戏文本的降级、`§` 色码剥离与长度收敛由本插件承担。
-
-群聊 ↔ 游戏内聊天、群指令 → 服务器命令、进服 / 退服 / 死亡 / 状态事件广播回群。
 
 ## 工作原理
 
@@ -133,8 +131,8 @@ bun run release     # changeset version → tsdown → npm publish
 
 - **Changesets**：每次用户可见改动随提交写 `.changeset/` 条目（0.x：破坏 → minor，修复 → patch）。
 - **exports 三态**：`types` → `lib/index.d.ts`；`development` → `src/index.ts`；`default` → `lib/index.cjs`。开发态直读 TS，发布件走 CJS。
-- **协议依赖**：`@kuro-bridge/protocol ^0.4.0` 是真实运行时依赖（0.4.0 起 exports 含 `require`，CJS 产物可直接解析，KD-10 结案）；本仓 golden 测试锁定发布件线格式，上游协议漂移立即红。
-- 约定详见 [AGENTS.md](AGENTS.md)；决策史（KD-01~13）见 [docs/KUROBRIDGE-NOTES.md](docs/KUROBRIDGE-NOTES.md)，变更明细见 [CHANGELOG.md](CHANGELOG.md)。
+- **协议依赖**：`@kuro-bridge/protocol ^0.4.0` 是真实运行时依赖（0.4.0 起 exports 含 `require`，CJS 产物可直接解析）；本仓 golden 测试锁定发布件线格式，上游协议漂移立即红。
+- 约定详见 [AGENTS.md](AGENTS.md)；模块机制与开发文档见 [docs/README.md](docs/README.md)，变更明细见 [CHANGELOG.md](CHANGELOG.md)。
 
 ---
 

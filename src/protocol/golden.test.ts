@@ -1,8 +1,7 @@
 /**
  * golden 帧对表测试 —— 锁定 `@kuro-bridge/protocol` 发布件的线格式
  *
- * 对表基线：KuroAdapter master `17be8f6`（协议 0.4.0）。KD-01 镜像时期用于人工同步，
- * 真包接入（KD-09）后对象改为包导出：常量逐字、encodeFrame 逐字节、schema 线格式
+ * 对表对象为包导出（协议 0.4.0）：常量逐字、encodeFrame 逐字节、schema 线格式
  * 双向（正形收窄为扁平消息、错形拒绝）。上游发布件若与预期漂移，此处立即红。
  */
 import { describe, expect, it } from "vitest";
@@ -34,14 +33,14 @@ import {
 /** 固定 v4 形状 UUID（版本/变体位合法，通过 z.uuid()） */
 const UUID = "00000000-0000-4000-8000-000000000000";
 
-describe("协议常量对表（0.4.0 / ADR-030 品牌迁移）", () => {
+describe("协议常量对表（0.4.0）", () => {
     it("PROTOCOL_NAME / PROTOCOL_VERSION / WS_SUBPROTOCOL", () => {
         expect(PROTOCOL_NAME).toBe("kurobridge-ws");
         expect(PROTOCOL_VERSION).toBe("0.4.0");
         expect(WS_SUBPROTOCOL).toBe("kurobridge-ws.v1");
     });
 
-    it("isProtocolVersionCompatible：主版本号相同即兼容（ADR-026）", () => {
+    it("isProtocolVersionCompatible：主版本号相同即兼容", () => {
         expect(isProtocolVersionCompatible("0.4.0", "0.4.0")).toBe(true);
         expect(isProtocolVersionCompatible("0.3.1", "0.4.0")).toBe(true);
         expect(isProtocolVersionCompatible("1.0.0", "0.4.0")).toBe(false);
@@ -86,7 +85,7 @@ describe("encodeFrame 线格式逐字节（扁平消息 → 单行 JSON 文本�
     });
 });
 
-/** 线 JSON → schema.parse → 扁平消息（两段式解析第二段，ADR-026） */
+/** 线 JSON → schema.parse → 扁平消息（两段式解析第二段） */
 function parseWire<T extends { parse: (input: unknown) => unknown }>(
     schema: T,
     wire: string,
@@ -348,7 +347,7 @@ describe("Server → Peer 帧线格式", () => {
         });
     });
 
-    it("bindings_updated：全量列表（非增量，ADR-004）", () => {
+    it("bindings_updated：全量列表（非增量）", () => {
         const parsed = parseWire(
             bindingsUpdatedFrame,
             encodeFrame({ type: "bindings_updated", body: { channelBindings: ["1", "2"] } }),

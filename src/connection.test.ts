@@ -1,5 +1,5 @@
 /**
- * connection.test.ts：KurobridgeConnection 全链路单测（任务书 M2）。
+ * connection.test.ts：KurobridgeConnection 全链路单测。
  *
  * 用假 kurobridge-ws 服务端（ws 库真端口，握手校验复刻 KuroAdapter NodeWsServer）驱动：
  * 带子协议握手 / 不带被拒 / hello 逐字段对表 / token 有无 / 应用层 ping / pong 透传 /

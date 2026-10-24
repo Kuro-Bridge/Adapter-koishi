@@ -1,11 +1,11 @@
 /**
- * Koishi 装配层（任务书 M5）——适配核心与 Koishi 宿主的唯一粘合处。
+ * Koishi 装配层——适配核心与 Koishi 宿主的唯一粘合处。
  *
- * 配置经 Schema 声明（控制台可编辑）；hello 身份按 KD-03：peerId = config.name、
+ * 配置经 Schema 声明（控制台可编辑）；hello 身份：peerId = config.name、
  * platform 固定 koishi、version = 插件包版本（运行时解析，失败退 unknown + warn）、
- * client 缺省 koishi-plugin-kurobridge/<版本>。入站挂 ctx.on("message")（KD-06，
- * 不占 middleware）；自过滤 userId === selfId（KD-05）；游戏事件经 ctx.broadcast
- * 单频道广播（帧内 channel 即路由目标）；dispose → adapter.stop()。
+ * client 缺省 koishi-plugin-kurobridge/<版本>。入站挂 ctx.on("message")
+ * （不占 middleware）；自过滤 userId === selfId 防环；游戏事件按在线 bot 平台拼
+ * platform:channel 后 ctx.broadcast（广播侧依赖 optional database）；dispose → adapter.stop()。
  */
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -194,7 +194,7 @@ export function apply(ctx: Context, config: Config): void {
             return; // 私聊/无频道上下文
         }
         if (userId === session.selfId) {
-            return; // bot 自身消息（KD-05 防环）
+            return; // bot 自身消息（防环）
         }
         adapter.handleInbound(channel, userId, session.username ?? userId, session.elements ?? []);
     });

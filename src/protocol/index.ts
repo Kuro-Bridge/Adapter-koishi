@@ -1,12 +1,11 @@
 /**
- * 协议依赖统一出口（KD-01 切换面，KD-09 已完成真包接入）
+ * 协议依赖统一出口
  *
- * 从 `@kuro-bridge/protocol`（0.4.0，KuroAdapter SSOT 发布包）具名 re-export——
- * 符号名两侧一致，镜像过渡形态（meta/frame/ws 三件套）已删除。仓内代码一律
- * `import ... from "../protocol/index.js"`（或等价相对路径），禁止直探包内深层
- * 模块——协议升级只改这一处。
+ * 从 `@kuro-bridge/protocol`（KuroProtocol 协议 SSOT 的 npm 发布件）具名 re-export，
+ * 符号名与包导出一致。仓内代码一律 `import ... from "../protocol/index.js"`
+ * （或等价相对路径），禁止直探包内深层模块——协议升级只改这一处。
  *
- * golden 对表测试（`./golden.test.js`）锁定包导出的 encodeFrame/schema 线格式，
+ * golden 对表测试（`./golden.test.ts`）锁定包导出的 encodeFrame/schema 线格式，
  * 防上游发布件与本仓预期漂移。
  */
 

@@ -1,8 +1,8 @@
 /**
- * KurobridgeAdapter：平台无关适配核心（任务书 M4，KD-08 不 import koishi）。
+ * KurobridgeAdapter：平台无关适配核心（不 import koishi，依赖全注入）。
  *
- * 持有连接层 + 绑定集状态（SSOT 在服务端：hello_ack 快照 + bindings_updated 全量热更，
- * KD-04）+ 命令/查询 pending 表（UUID 关联）。
+ * 持有连接层 + 绑定集状态（SSOT 在服务端：hello_ack 快照 + bindings_updated 全量热更）
+ * + 命令/查询 pending 表（UUID 关联）。
  *
  * 对宿主暴露回调：onLog / onGameEvent(type, rendered, channel)（宿主广播到平台）/
  * onStatus（服务器状态帧透传，StatusBody 无 channel）。
@@ -32,7 +32,7 @@ export type GameEventType = GameEventKind | "command_result";
 /** 查询类别（对齐协议 query.kind）。 */
 export type QueryKind = "status" | "bindings";
 
-/** 宿主回调面（M5 装配为 ctx.logger / ctx.broadcast / 状态展示）。 */
+/** 宿主回调面（装配为 ctx.logger / ctx.broadcast / 状态展示）。 */
 export interface AdapterCallbacks {
     onLog: (level: ConnectionLogLevel, msg: string, extra?: Record<string, unknown>) => void;
     /** 渲染完成的游戏事件/命令回执（宿主负责广播到对应平台频道）。 */
@@ -41,7 +41,7 @@ export interface AdapterCallbacks {
     onStatus: (status: StatusBody) => void;
 }
 
-/** 适配层参数（连接节奏必填——测试快值 / M5 Schema 缺省二选一注入）。 */
+/** 适配层参数（连接节奏必填——测试快值 / 装配层 Schema 缺省二选一注入）。 */
 export interface KurobridgeAdapterOptions {
     url: string;
     hello: KurobridgeHello;
@@ -121,7 +121,7 @@ export class KurobridgeAdapter {
     }
 
     /**
-     * 入站消息统一入口（M5 传入 session 要素）：绑定过滤（命令不受限）→ 元素降级 →
+     * 入站消息统一入口（装配传入 session 要素）：绑定过滤（命令不受限）→ 元素降级 →
      * 命令前缀分流（空命令忽略）→ chat 帧。
      */
     handleInbound(
@@ -153,7 +153,7 @@ export class KurobridgeAdapter {
         return this.sendChat(channel, sender, content);
     }
 
-    /** 群指令 → 游戏命令（pending 登记 + command 帧；不做绑定过滤，KD-04）。 */
+    /** 群指令 → 游戏命令（pending 登记 + command 帧；不做绑定过滤）。 */
     forwardCommand(channel: string, userId: string, command: string): boolean {
         if (command === "") {
             return false;

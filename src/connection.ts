@@ -1,16 +1,16 @@
 /**
- * KurobridgeConnection：kurobridge-ws 客户端连接层（任务书 M2）
+ * KurobridgeConnection：kurobridge-ws 客户端连接层
  *
  * 状态机 `idle → connecting → establishing → established ↔ backoff → stopped`：
  * - 子协议 `kurobridge-ws.v1` 必带（不带被服务端握手期拒绝）；
  * - open 即发 hello（UUID，超时自断走重试；每次连接/重连都重新握手，UUID 每次新）；
  * - hello_ack 按 id 关联：ok → established + 启动应用层 ping；ok:false → 永久停止
- *   （版本/token 问题不可自愈，peer-guide §7）；
+ *   （版本/token 问题不可自愈）；
  * - close 1002（协议错误）/ 1008（鉴权失败）→ 永久停止；1001 / 1006 / 网络错误 →
  *   指数退避重连（1s 起 ×2 封顶 30s，±20% 抖动防惊群；重连成功后退避重置）；
  * - 未 established 时 send 丢弃返回 false，不积压；
  * - 未知事件帧忽略、未知请求帧回 `<type>_result` 失败回执、`_result` 结尾不回执
- *   （防乒乓），对齐 peer-guide §5.3 未知帧容忍；
+ *   （防乒乓），对齐 peer-guide 未知帧容忍；
  * - 用户 stop() 静默（清定时器关连接，不触发 onEnded、不再重连）。
  */
 import { randomUUID } from "node:crypto";
@@ -42,7 +42,7 @@ import {
     wireFrameSchema,
 } from "./protocol/index.js";
 
-/** 连接层日志级别（宿主回调面，M4 由适配层透传到 Koishi logger）。 */
+/** 连接层日志级别（宿主回调面，经适配层透传到 Koishi logger）。 */
 export type ConnectionLogLevel = "debug" | "info" | "warn" | "error";
 
 /** 服务端 → 对端的已知业务帧（扁平消息；hello_ack 由连接层内部消费不经此回调）。 */
@@ -90,7 +90,7 @@ export interface KurobridgeConnectionOptions {
     retryBaseDelayMs: number;
     /** 重连退避上限毫秒。 */
     retryMaxDelayMs: number;
-    /** 退避抖动幅度 0..1（缺省 0.2 = ±20%，peer-guide §7 防惊群；测试快值传 0）。 */
+    /** 退避抖动幅度 0..1（缺省 0.2 = ±20% 防惊群；测试快值传 0）。 */
     retryJitter?: number;
     /** 握手成功（ack ok，含绑定快照）。 */
     onEstablished: (ack: HelloAckOkBody) => void;
@@ -303,7 +303,7 @@ export class KurobridgeConnection {
         return msg;
     }
 
-    /** 未知帧容忍（对齐 peer-guide §5.3）：事件帧忽略；请求帧回 `<type>_result` 失败回执；`_result` 结尾不回执（防乒乓）。 */
+    /** 未知帧容忍（对齐 peer-guide）：事件帧忽略；请求帧回 `<type>_result` 失败回执；`_result` 结尾不回执（防乒乓）。 */
     private handleUnknownFrame(type: string, id: string | undefined): void {
         if (id === undefined) {
             this.log("debug", "未知事件帧，忽略", { type });
