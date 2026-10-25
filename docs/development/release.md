@@ -102,13 +102,16 @@ npm trust list "koishi-plugin-kurobridge"
 ## 4. 日常发布
 
 1. 按惯例在 `.changeset/` 写条目（勿攒）；改动进 main。
-2. 本地一条命令完成 bump 与验证：
+2. bump 版本并提交。推荐一条命令完成 bump 与本地预检：
 
    ```bash
    bun run release        # changeset version → bun run gate → bun run verify:release
    ```
 
-   `verify:release` 依赖 `lib/`（gate 已含 build）。本地不再有 `npm publish`。
+   最小路径 `bunx changeset version`（只消费条目、bump 版本；门禁与终验由流水线
+   prepare 环重跑，红了再修即可）。注意：**只写 changeset 条目、不 bump 版本，不会
+   触发发布**——流水线按「package.json 版本不在 registry」判定，条目本身不动版本号。
+   两种路径本地都不再有 `npm publish`。
 3. 提交并推送 main（简体中文提交信息，含 bump 后的 `package.json` 与 `CHANGELOG.md`）。
 4. `Release` 自动触发，`prepare` 日志里留下发布件证据（清单 / files 纪律 / peer 契约）。
 5. **审批前核对**（GitHub → Actions → 该次 Release 运行 → Review deployments）：

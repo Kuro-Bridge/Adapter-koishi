@@ -42,7 +42,7 @@ bun run gate         # 全量门禁：check + test + build（CI 与发布链同�
   ```
 
 - bump 类型（0.x 阶段）：API 破坏 → minor，修复 → patch；纯 chore 不需要。
-- 发版：`bun run release`（changeset version + 全量门禁 + 发布件终验；**本地不做 npm publish**）→ 提交推送 main → GitHub 审批 `release` environment。**铁律：一切发布走 OIDC 流水线，禁止本地 `npm publish`**；详见 [docs/development/release.md](docs/development/release.md)。发不出先查 `.changeset/` 是否有 pending 条目、再看 Actions 的 Release 运行日志。
+- 发版：消费 `.changeset/` 条目 bump 版本——推荐 `bun run release`（changeset version + 全量门禁 + 发布件终验，本地 20 秒提前红）；最小路径 `bunx changeset version`（门禁交给流水线重跑）。**只写条目不 bump 版本不会触发发布**。bump 后提交推送 main → GitHub 审批 `release` environment。**铁律：一切发布走 OIDC 流水线，禁止本地 `npm publish`**；详见 [docs/development/release.md](docs/development/release.md)。发不出先查 `.changeset/` 是否有 pending 条目、再看 Actions 的 Release 运行日志。
 
 ## git 提交流程
 
