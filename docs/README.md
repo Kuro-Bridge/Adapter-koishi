@@ -14,6 +14,7 @@
 | [architecture/assembly.md](architecture/assembly.md) | Koishi 装配、配置规范、广播路由 | `src/index.ts` |
 | [development/testing.md](development/testing.md) | 测试体系：假服务端、契约、桩与冒烟 | `src/*.test.ts`、`src/test-support.ts` |
 | [development/workflow.md](development/workflow.md) | 工作区、门禁、构建产物、Changesets、已知坑 | 工程配置文件 |
+| [development/release.md](development/release.md) | OIDC 可信发布：流水线、一次性配置、日常发版、排障 | `.github/workflows/release.yml`、`scripts/verify-*.ts` |
 
 ## 阅读路线
 

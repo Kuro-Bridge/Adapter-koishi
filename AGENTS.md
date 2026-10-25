@@ -1,6 +1,6 @@
 # 项目常驻指令
 
-> 本文件是本仓库（koishi-plugin-kurobridge，Koishi 插件）的常驻开发约定。技术栈：TypeScript 7（@typescript/native）+ tsdown + biome + Changesets，开发环境为宿主工作区（external/ 下，依赖由工作区根提升提供，项目内无需 install，包管理器一律 Bun）。
+> 本文件是本仓库（koishi-plugin-kurobridge，Koishi 插件）的常驻开发约定。技术栈：TypeScript 7 + tsdown + biome + Changesets，开发环境为宿主工作区（external/ 下，依赖由工作区根提升提供，项目内无需 install，包管理器一律 Bun）。
 
 ## 基本约束
 
@@ -14,6 +14,7 @@ bun run check        # 门禁：biome check + 类型检查（提交前必跑）
 bun run fix          # biome 自动修复 + 类型检查
 bun run build        # tsdown 构建，产物 lib/index.cjs（Koishi loader 用 require 加载 CJS）
 bun run typecheck    # 仅类型检查
+bun run gate         # 全量门禁：check + test + build（CI 与发布链同构入口）
 ```
 
 - 门禁全绿才提交；逐功能小步提交。
@@ -41,7 +42,7 @@ bun run typecheck    # 仅类型检查
   ```
 
 - bump 类型（0.x 阶段）：API 破坏 → minor，修复 → patch；纯 chore 不需要。
-- 发版：`bun run release`（changeset version → tsdown → npm publish）；发不出先查 `.changeset/` 是否有 pending 条目。
+- 发版：`bun run release`（changeset version + 全量门禁 + 发布件终验；**本地不做 npm publish**）→ 提交推送 main → GitHub 审批 `release` environment。**铁律：一切发布走 OIDC 流水线，禁止本地 `npm publish`**；详见 [docs/development/release.md](docs/development/release.md)。发不出先查 `.changeset/` 是否有 pending 条目、再看 Actions 的 Release 运行日志。
 
 ## git 提交流程
 

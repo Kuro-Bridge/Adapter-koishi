@@ -12,7 +12,9 @@
 | `bun run fix` | biome 自动修复 + 类型检查 |
 | `bun run test` | vitest 全量 |
 | `bun run build` | tsdown 构建 `lib/index.cjs` + `.d.ts` |
-| `bun run release` | changeset version → tsdown → npm publish |
+| `bun run gate` | 全量门禁：check + test + build（CI 与发布链同构入口） |
+| `bun run verify:release` | 发布件终验：pack 清单 / files 纪律 / peer 契约（需先 build） |
+| `bun run release` | changeset version + 全量门禁 + 发布件终验（**不含 publish**，发布走流水线） |
 
 **本仓无 pre-commit 钩子**，门禁不会拦提交——每次提交前手动跑 `bun run check`；逐功能小步提交，简体中文提交信息（`feat:` / `fix:` / `docs:` / `chore:`），主分支直提。仓内开发约定速查见 [AGENTS.md](../../AGENTS.md)。
 
@@ -35,7 +37,7 @@ tsdown 入口 `src/index.ts`，产物固定 CJS（`lib/index.cjs`）：Koishi lo
 
 - 每次用户可见改动随提交在 `.changeset/` 写条目，勿攒到发版前。0.x 阶段：API 破坏 → minor，修复 → patch；纯 chore 不需要。
 - 已知坑：全新仓库首次 commit 之前 `changeset status` 报 "Failed to find where HEAD diverged"——先做初始提交即可。
-- 发版 `bun run release`；发不出先查 `.changeset/` 是否有 pending 条目。
+- 发版 `bun run release`（本地只 bump 与验证）；**发布一律走 OIDC 流水线，禁止本地 `npm publish`**，流程见 [release.md](release.md)。
 
 ## 已知坑实录
 
