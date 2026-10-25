@@ -12,10 +12,10 @@ import type {
     ConnectionEndedReason,
     KurobridgeConnectionOptions,
     ServerEventMessage,
-} from "./connection.js";
-import { KurobridgeConnection } from "./connection.js";
-import { type HelloAckOkBody, WS_SUBPROTOCOL } from "./protocol/index.js";
-import { type FakeKurobridgeServer, startFakeKurobridgeServer, waitFor } from "./test-support.js";
+} from "../connection.ts";
+import { KurobridgeConnection } from "../connection.ts";
+import { type HelloAckOkBody, WS_SUBPROTOCOL } from "../protocol/index.ts";
+import { type FakeKurobridgeServer, startFakeKurobridgeServer, waitFor } from "../test-support.ts";
 
 /** 测试快参数（重连/心跳/握手超时全部加速，抖动归零保确定性）。 */
 const FAST = {

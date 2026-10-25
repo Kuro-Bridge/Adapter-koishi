@@ -32,8 +32,8 @@ vi.mock("koishi", () => {
 });
 
 import type { Context } from "koishi";
-import { apply, type Config } from "./index.js";
-import { type FakeKurobridgeServer, startFakeKurobridgeServer, waitFor } from "./test-support.js";
+import { apply, type Config } from "../index.ts";
+import { type FakeKurobridgeServer, startFakeKurobridgeServer, waitFor } from "../test-support.ts";
 
 /** broadcast 调用记录。 */
 interface BroadcastRecord {

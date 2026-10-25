@@ -4,7 +4,7 @@
  * 入站降级（元素树→文本）、出站渲染（四模板/色码剥离/截断）、command_result 三态。
  */
 import { describe, expect, it } from "vitest";
-import type { CommandResultBody } from "./protocol/index.js";
+import type { CommandResultBody } from "../protocol/index.ts";
 import {
     DEFAULT_MAX_MESSAGE_LENGTH,
     DEFAULT_TEMPLATES,
@@ -15,7 +15,7 @@ import {
     stripColorCodes,
     type TreeElement,
     truncateText,
-} from "./translate.js";
+} from "../translate.ts";
 
 /** 测试用渲染选项（缺省值 + 可局部覆盖）。 */
 function opts(overrides?: Partial<RenderOptions>): RenderOptions {

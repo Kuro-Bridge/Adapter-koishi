@@ -7,15 +7,15 @@
  */
 import { afterAll, describe, expect, it } from "vitest";
 import type { WebSocket } from "ws";
-import type { GameEventType } from "./adapter.js";
-import { KurobridgeAdapter } from "./adapter.js";
+import type { GameEventType } from "../adapter.ts";
+import { KurobridgeAdapter } from "../adapter.ts";
 import {
     type FakeKurobridgeServer,
     type FakeServerFrame,
     startFakeKurobridgeServer,
     waitFor,
-} from "./test-support.js";
-import { DEFAULT_TEMPLATES, type RenderOptions } from "./translate.js";
+} from "../test-support.ts";
+import { DEFAULT_TEMPLATES, type RenderOptions } from "../translate.ts";
 
 /** 测试快参数（抖动归零保确定性）。 */
 const FAST = {
