@@ -1,5 +1,15 @@
 # koishi-plugin-kurobridge
 
+## 0.2.1
+
+### Patch Changes
+
+- fix(build): devDependencies 的 TypeScript 从 `@typescript/native: npm:typescript@7.0.2` 别名改为真名 `typescript@7.0.2`——独立 checkout（脱离宿主工作区）时 tsdown 的 dts 打包按字面名解析 `typescript` 包，别名形态必红，此前本地能过全靠工作区根提升。
+
+- 协议对表锚同步：金样本常量对表与 hello 集成断言从 0.4.0 收敛到 0.4.1（`^0.4.0` 独立解析面已到 0.4.1；0.4.1 为发布工程补丁，线协议零变更）。
+
+- ci(release): 接入 npm 可信发布流水线（OIDC）：prepare（检测→门禁→发布件终验→打包）→ publish（`release` environment 审批 + id-token）→ tag；新增 push/PR 全量门禁 CI；本地 `bun run release` 收敛为 bump 与验证，**不再本地 npm publish**，仓库不持有任何 npm 长期 token（详见 docs/development/release.md）。
+
 ## 0.2.0
 
 ### Minor Changes

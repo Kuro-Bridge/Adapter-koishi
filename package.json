@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "koishi-plugin-kurobridge",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "kurobridge-ws 官方参考对端：MC 服务器 ↔ 聊天平台群服互通（Koishi v4）",
   "contributors": [
     "Oppenheymu <oppenheymu@gmail.com>"
@@ -46,10 +46,12 @@
     "check": "biome check . && tsc --noEmit",
     "fix": "biome check --write . && tsc --noEmit",
     "changeset": "changeset",
-    "release": "changeset version && tsdown && npm publish --access public"
+    "gate": "bun run check && bun run test && bun run build",
+    "verify:release": "bun scripts/verify-release.ts",
+    "release": "changeset version && bun run gate && bun run verify:release"
   },
   "dependencies": {
-    "@kuro-bridge/protocol": "^0.4.0",
+    "@kuro-bridge/protocol": "^0.4.1",
     "ws": "^8.18.0",
     "zod": "^4.0.0"
   },
@@ -61,8 +63,8 @@
     "@changesets/cli": "^2.31.1",
     "@types/node": "^26.4.0",
     "@types/ws": "^8.18.0",
-    "@typescript/native": "npm:typescript@7.0.2",
     "tsdown": "^0.22.14",
+    "typescript": "7.0.2",
     "vitest": "^4.1.10"
   },
   "koishi": {
