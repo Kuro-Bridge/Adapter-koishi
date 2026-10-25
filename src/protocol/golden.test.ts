@@ -1,7 +1,7 @@
 /**
  * golden 帧对表测试 —— 锁定 `@kuro-bridge/protocol` 发布件的线格式
  *
- * 对表对象为包导出（协议 0.4.0）：常量逐字、encodeFrame 逐字节、schema 线格式
+ * 对表对象为包导出（协议 0.4.1）：常量逐字、encodeFrame 逐字节、schema 线格式
  * 双向（正形收窄为扁平消息、错形拒绝）。上游发布件若与预期漂移，此处立即红。
  */
 import { describe, expect, it } from "vitest";
@@ -33,10 +33,10 @@ import {
 /** 固定 v4 形状 UUID（版本/变体位合法，通过 z.uuid()） */
 const UUID = "00000000-0000-4000-8000-000000000000";
 
-describe("协议常量对表（0.4.0）", () => {
+describe("协议常量对表（0.4.1）", () => {
     it("PROTOCOL_NAME / PROTOCOL_VERSION / WS_SUBPROTOCOL", () => {
         expect(PROTOCOL_NAME).toBe("kurobridge-ws");
-        expect(PROTOCOL_VERSION).toBe("0.4.0");
+        expect(PROTOCOL_VERSION).toBe("0.4.1");
         expect(WS_SUBPROTOCOL).toBe("kurobridge-ws.v1");
     });
 

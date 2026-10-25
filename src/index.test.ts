@@ -170,7 +170,7 @@ describe("Koishi 装配", () => {
         expect(hello?.body).toMatchObject({
             peerId: "koishi-test",
             platform: "koishi",
-            protocolVersion: "0.4.0",
+            protocolVersion: "0.4.1",
         });
         expect((hello?.body as { version?: string } | undefined)?.version).toMatch(
             /^\d+\.\d+\.\d+$|^unknown/,
