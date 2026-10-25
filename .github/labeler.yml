@@ -1,0 +1,61 @@
+# PR 自动打标配置（actions/labeler v5，由 triage workflow 消费）。
+#
+# 仅覆盖「范围」与「文档 / 发版 / 工具链」维度：类型标签由 issue 模板
+# 自带，优先级 / 破坏性 / 状态维度由维护者手动维护。glob 未命中时不出
+# 标签；sync-labels 关闭，只增不减，手动摘除不会被后续 push 加回。
+#
+# 前导 / 锚定仓库根级文件（否则会匹配到子目录内的同名文件）。
+# documentation 故意不用 **/*.md：那会把 .changeset/*.md 也吸进来，
+# 与 release 双打；改用 /*.md + /docs/** 精确圈定。
+
+"module: connection":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "/src/connection.ts"
+          - "/src/connection.test.ts"
+
+"module: translate":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "/src/translate.ts"
+          - "/src/translate.test.ts"
+
+"module: adapter":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "/src/adapter.ts"
+          - "/src/adapter.test.ts"
+
+"module: koishi":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "/src/index.ts"
+          - "/src/index.test.ts"
+
+"module: protocol":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "/src/protocol/**"
+
+"documentation":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "/*.md"
+          - "/docs/**"
+
+"release":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "/.changeset/**"
+
+"chore":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "/*.json*"
+          - "/tsconfig.json"
+          - "/tsdown.config.ts"
+
+"ci":
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/**"
